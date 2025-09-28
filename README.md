@@ -1,12 +1,18 @@
 # Icon Automation Workflow Using Figma
 
+！！！只有在Figma文件中打成components（紫色组件）才可以成功导出
+
 It's a repository for [Figma Icon Automation Plugin](https://github.com/leadream/figma-icon-automation).
 
 ## Development
 Create a `.env` in the root directory. Put your Figma file url and Figma token inside.
 
 ```
-FIGMA_FILE_URL=https://www.figma.com/file/********************/juuust-react-icon
+支持有无project-name的figma链接：
+新格式（无项目名）：https://www.figma.com/design/FILE_ID
+新格式（有项目名）：https://www.figma.com/design/FILE_ID/project-name
+
+FIGMA_FILE_URL=https://www.figma.com/design/********************
 FIGMA_TOKEN=********************************
 ```
 
