@@ -4,7 +4,7 @@ const { join, resolve } = require("path");
 const Figma = require("figma-js");
 const PQueue = require("p-queue");
 require("dotenv").config();
-const { FIGMA_TOKEN, FIGMA_FILE_URL } = process.env;
+const { FIGMA_PAGE, FIGMA_TOKEN, FIGMA_FILE_URL } = process.env;
 
 const options = {
   format: "svg",
@@ -51,7 +51,7 @@ client
     console.log("Processing response");
     const components = {};
 
-    function check(c) {
+    function check(c, pageName) {
       if (c.type === "COMPONENT") {
         const { name, id } = c;
         const { description = "", key } = data.components[c.id];
@@ -65,14 +65,30 @@ client
           description,
           width,
           height,
+          page: pageName,
         };
       } else if (c.children) {
-        // eslint-disable-next-line github/array-foreach
-        c.children.forEach(check);
+        c.children.forEach((child) => check(child, pageName));
       }
     }
 
-    data.document.children.forEach(check);
+    data.document.children.forEach((page) => {
+      const pageName = page.name;
+      console.log(`Found page: ${pageName}`);
+      // 如果指定了 FIGMA_PAGE，只处理匹配的页面
+      if (FIGMA_PAGE) {
+        if (pageName.toLowerCase().includes(FIGMA_PAGE.toLowerCase())) {
+          console.log(`✅ Processing page: ${pageName}`);
+          check(page, pageName);
+        } else {
+          console.log(`⏭️  Skipping page: ${pageName}`);
+        }
+      } else {
+        // 如果没有指定页面，处理所有页面
+        console.log(`✅ Processing page: ${pageName}`);
+        check(page, pageName);
+      }
+    });
     if (Object.values(components).length === 0) {
       throw Error("No components found!");
     }
